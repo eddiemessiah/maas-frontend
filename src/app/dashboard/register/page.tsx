@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { Database, Plus } from "lucide-react";
-import { useAccount, useConnect, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
-import { injected } from 'wagmi/connectors'
+import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 const registryAddress = "0x5818d8A494a0aa7C9eB2Fa6aFCBbd28f02e527E6" as const;
 const registryABI = [
@@ -24,8 +24,7 @@ const registryABI = [
 ] as const;
 
 export default function Register() {
-  const { isConnected, address } = useAccount();
-  const { connect } = useConnect();
+  const { isConnected } = useAccount();
   const { data: hash, writeContract, error: writeError, isPending } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
 
@@ -37,7 +36,6 @@ export default function Register() {
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isConnected) {
-        connect({ connector: injected() });
         return;
     }
     
@@ -88,12 +86,8 @@ export default function Register() {
             <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-emerald-500/50" />
 
             <div className="mb-6 flex justify-between items-center">
-               <span className="text-xs font-mono text-zinc-400">STATUS: {isConnected ? <span className="text-emerald-400">CONNECTED {address?.slice(0,6)}...{address?.slice(-4)}</span> : <span className="text-amber-400">OFFLINE</span>}</span>
-               {!isConnected && (
-                 <button onClick={() => connect({ connector: injected() })} className="text-xs font-mono bg-zinc-900 border border-white/10 px-3 py-1 hover:bg-zinc-800 transition-colors">
-                   CONNECT WALLET
-                 </button>
-               )}
+               <span className="text-xs font-mono text-zinc-400">STATUS: {isConnected ? <span className="text-emerald-400">CONNECTED</span> : <span className="text-amber-400">OFFLINE</span>}</span>
+               <ConnectButton />
             </div>
 
             <form onSubmit={handleRegister} className="space-y-4">
@@ -147,7 +141,7 @@ export default function Register() {
 
               <button 
                 type="submit"
-                disabled={isPending || isConfirming}
+                disabled={isPending || isConfirming || !isConnected}
                 className="w-full mt-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono tracking-widest text-xs py-3 hover:bg-emerald-500/20 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {isPending ? "SIGNING..." : isConfirming ? "MINING..." : "INITIALIZE DEPLOYMENT"}

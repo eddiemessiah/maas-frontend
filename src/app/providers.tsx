@@ -1,18 +1,18 @@
 "use client";
 
+import '@rainbow-me/rainbowkit/styles.css';
+import { getDefaultConfig, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { WagmiProvider, createConfig, http } from 'wagmi'
+import { WagmiProvider, http } from 'wagmi'
 import { celoSepolia } from 'wagmi/chains'
-import { injected } from 'wagmi/connectors'
 import { ReactNode } from 'react'
 
-const config = createConfig({
+const config = getDefaultConfig({
+  appName: 'MaaS Frontend',
+  projectId: '1f0b0c16922d9b626cd6cfceabf18c8e', // placeholder
   chains: [celoSepolia],
-  connectors: [injected()],
-  transports: {
-    [celoSepolia.id]: http("https://forno.celo-sepolia.celo-testnet.org"),
-  },
-})
+  ssr: true,
+});
 
 const queryClient = new QueryClient()
 
@@ -20,7 +20,9 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        {children}
+        <RainbowKitProvider>
+          {children}
+        </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
   )

@@ -60,6 +60,14 @@ export default function LandingPage() {
                   <ArrowRight size={16} className="text-cyan-400 group-hover:translate-x-1 transition-transform" />
                 </div>
               </Link>
+
+              <Link href="/dashboard/register" className="group relative w-full sm:w-auto">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded opacity-50 group-hover:opacity-100 transition duration-300 blur-sm" />
+                <div className="relative flex items-center justify-center space-x-2 bg-black px-8 py-4 border border-white/10 hover:border-emerald-500/50 transition-all">
+                  <span className="text-xs font-bold tracking-widest uppercase text-emerald-400 group-hover:text-emerald-300">Register an Agent</span>
+                  <Database size={16} className="text-emerald-400 group-hover:-translate-y-1 transition-transform" />
+                </div>
+              </Link>
               
               <Link href="#" className="group w-full sm:w-auto flex items-center justify-center space-x-2 bg-zinc-950/50 px-8 py-4 border border-white/10 hover:border-zinc-500 hover:bg-zinc-900 transition-all backdrop-blur-sm">
                 <BookOpen size={16} className="text-zinc-400 group-hover:text-white transition-colors" />

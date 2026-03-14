@@ -1,14 +1,18 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { LayoutDashboard, Users, Database, Settings, Activity } from "lucide-react";
+import { LayoutDashboard, Users, Database, Settings, Activity, Plus } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function Sidebar() {
+  const pathname = usePathname();
+
   const navItems = [
-    { name: "TELEMETRY", icon: LayoutDashboard, active: true },
-    { name: "AGENTS", icon: Users, active: false },
-    { name: "MEMORY", icon: Database, active: false },
-    { name: "CONFIG", icon: Settings, active: false },
+    { name: "TELEMETRY", icon: LayoutDashboard, href: "/dashboard" },
+    { name: "AGENTS", icon: Users, href: "/dashboard/agents" },
+    { name: "MEMORY", icon: Database, href: "/dashboard/memory" },
+    { name: "CONFIG", icon: Settings, href: "/dashboard/config" },
   ];
 
   return (
@@ -21,26 +25,51 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 space-y-2">
-        {navItems.map((item) => (
-          <button
-            key={item.name}
+        {navItems.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <Link
+              href={item.href}
+              key={item.name}
+              className={`w-full flex items-center space-x-3 px-3 py-2 rounded transition-all group relative overflow-hidden ${
+                isActive
+                  ? "bg-cyan-900/20 text-cyan-400 border border-cyan-500/30 shadow-[inset_0_0_15px_rgba(6,182,212,0.1)]"
+                  : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5 border border-transparent"
+              }`}
+            >
+              <item.icon size={18} className={isActive ? "text-cyan-400" : "group-hover:text-zinc-300"} />
+              <span className="text-xs font-semibold tracking-widest hidden md:block">{item.name}</span>
+              {isActive && (
+                <motion.div
+                  layoutId="activeTab"
+                  className="absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]"
+                  initial={false}
+                />
+              )}
+            </Link>
+          );
+        })}
+
+        <div className="pt-4 border-t border-white/10 mt-4">
+          <Link
+            href="/dashboard/register"
             className={`w-full flex items-center space-x-3 px-3 py-2 rounded transition-all group relative overflow-hidden ${
-              item.active
-                ? "bg-cyan-900/20 text-cyan-400 border border-cyan-500/30 shadow-[inset_0_0_15px_rgba(6,182,212,0.1)]"
-                : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5 border border-transparent"
+              pathname === "/dashboard/register"
+                ? "bg-emerald-900/20 text-emerald-400 border border-emerald-500/30 shadow-[inset_0_0_15px_rgba(16,185,129,0.1)]"
+                : "text-emerald-500 hover:text-emerald-300 hover:bg-emerald-500/5 border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)] hover:shadow-[0_0_15px_rgba(16,185,129,0.3)]"
             }`}
           >
-            <item.icon size={18} className={item.active ? "text-cyan-400" : "group-hover:text-zinc-300"} />
-            <span className="text-xs font-semibold tracking-widest hidden md:block">{item.name}</span>
-            {item.active && (
+            <Plus size={18} className={pathname === "/dashboard/register" ? "text-emerald-400" : "group-hover:text-emerald-300"} />
+            <span className="text-xs font-bold tracking-widest hidden md:block">REGISTER AGENT</span>
+            {pathname === "/dashboard/register" && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]"
+                className="absolute left-0 top-0 bottom-0 w-[2px] bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)]"
                 initial={false}
               />
             )}
-          </button>
-        ))}
+          </Link>
+        </div>
       </nav>
 
       <div className="mt-auto pt-4 border-t border-white/10 hidden md:block">
