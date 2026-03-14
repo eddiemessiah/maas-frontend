@@ -13,11 +13,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Convert JSON to buffer for upload
-    const jsonString = JSON.stringify(payload);
-    const buffer = Buffer.from(jsonString);
-
-    // Write buffer to Lighthouse
     const apiKey = process.env.LIGHTHOUSE_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
@@ -26,7 +21,9 @@ export async function POST(req: Request) {
       );
     }
 
-    const uploadResponse = await lighthouse.uploadBuffer(buffer, apiKey);
+    // Convert JSON to string and upload directly
+    const jsonString = JSON.stringify(payload);
+    const uploadResponse = await lighthouse.uploadText(jsonString, apiKey);
 
     return NextResponse.json({
       success: true,
