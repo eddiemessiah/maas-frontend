@@ -16,6 +16,7 @@
     "lucide-react": "^0.381.0"
   },
   "devDependencies": {
+    "autoprefixer": "^10.4.19",
     "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^18",
