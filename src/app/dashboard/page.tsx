@@ -4,9 +4,36 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { Activity, Server, Cpu, Network, Zap } from "lucide-react";
+import { useReadContract } from 'wagmi'
+
+const registryAddress = "0x5818d8A494a0aa7C9eB2Fa6aFCBbd28f02e527E6" as const;
+const registryABI = [
+  {
+    "inputs": [],
+    "name": "getAllAgents",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+] as const;
 
 export default function Home() {
   const [data, setData] = useState<any>(null);
+
+  // Read AgentRegistry from Celo Sepolia
+  const { data: agentsData } = useReadContract({
+    address: registryAddress,
+    abi: registryABI,
+    functionName: 'getAllAgents',
+  })
+
+  const agentCount = agentsData ? (agentsData as any[]).length : 0;
 
   useEffect(() => {
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://maas-api.up.railway.app";
@@ -17,7 +44,7 @@ export default function Home() {
   }, []);
 
   const metrics = [
-    { title: "ACTIVE SUB-AGENTS", value: "24", unit: "UNITS", icon: Network, color: "text-cyan-400", border: "border-cyan-500/20", shadow: "shadow-[0_0_15px_rgba(6,182,212,0.1)]" },
+    { title: "ACTIVE SUB-AGENTS", value: agentCount.toString(), unit: "UNITS", icon: Network, color: "text-cyan-400", border: "border-cyan-500/20", shadow: "shadow-[0_0_15px_rgba(6,182,212,0.1)]" },
     { title: "TOTAL MEMORY INDEXED", value: "1.2", unit: "TB", icon: Server, color: "text-purple-400", border: "border-purple-500/20", shadow: "shadow-[0_0_15px_rgba(168,85,247,0.1)]" },
     { title: "COMPUTE NODES", value: "8", unit: "ACTIVE", icon: Cpu, color: "text-emerald-400", border: "border-emerald-500/20", shadow: "shadow-[0_0_15px_rgba(16,185,129,0.1)]" },
     { title: "AVG LATENCY", value: "42", unit: "MS", icon: Zap, color: "text-amber-400", border: "border-amber-500/20", shadow: "shadow-[0_0_15px_rgba(245,158,11,0.1)]" }

@@ -7,10 +7,10 @@ dotenv.config();
 const config: HardhatUserConfig = {
   solidity: "0.8.20",
   networks: {
-    alfajores: {
-      url: "https://alfajores-forno.celo-testnet.org",
+    "celo-sepolia": {
+      url: "https://forno.celo-sepolia.celo-testnet.org",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      chainId: 44787,
+      chainId: 11142220,
     },
     celo: {
       url: "https://forno.celo.org",
@@ -21,7 +21,8 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: {
         alfajores: process.env.CELOSCAN_API_KEY || "",
-        celo: process.env.CELOSCAN_API_KEY || ""
+        celo: process.env.CELOSCAN_API_KEY || "",
+        "celo-sepolia": process.env.CELOSCAN_API_KEY || "empty"
     },
     customChains: [
         {
@@ -40,6 +41,14 @@ const config: HardhatUserConfig = {
                 browserURL: "https://celoscan.io/",
             },
         },
+        {
+            network: "celo-sepolia",
+            chainId: 11142220,
+            urls: {
+                apiURL: "https://celo-sepolia.blockscout.com/api",
+                browserURL: "https://celo-sepolia.blockscout.com/",
+            },
+        }
     ]
   }
 };
