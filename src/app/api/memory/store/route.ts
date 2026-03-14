@@ -1,34 +1,44 @@
 import { NextResponse } from 'next/server';
 import lighthouse from '@lighthouse-web3/sdk';
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const body = await request.json();
-    const { agentId, memoryType, data } = body;
-
-    if (!agentId || !memoryType || !data) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    const payload = await req.json();
+    
+    // Validate payload
+    if (!payload.agentId || !payload.memoryType || !payload.data) {
+      return NextResponse.json(
+        { error: 'Missing required fields: agentId, memoryType, data' },
+        { status: 400 }
+      );
     }
 
-    const payload = JSON.stringify({ agentId, memoryType, data, timestamp: Date.now() });
-    
+    // Convert JSON to buffer for upload
+    const jsonString = JSON.stringify(payload);
+    const buffer = Buffer.from(jsonString);
+
+    // Write buffer to Lighthouse
     const apiKey = process.env.LIGHTHOUSE_API_KEY;
     if (!apiKey) {
-      return NextResponse.json({ error: 'Missing Lighthouse API Key' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Server configuration error: Missing Lighthouse API Key' },
+        { status: 500 }
+      );
     }
 
-    const name = `memory-${agentId}-${Date.now()}.json`;
-    
-    // Lighthouse SDK text upload
-    const response = await lighthouse.uploadText(payload, apiKey, name);
+    const uploadResponse = await lighthouse.uploadBuffer(buffer, apiKey);
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
-      cid: response.data.Hash, 
-      url: `https://gateway.lighthouse.storage/ipfs/${response.data.Hash}` 
+      cid: uploadResponse.data.Hash,
+      url: `https://gateway.lighthouse.storage/ipfs/${uploadResponse.data.Hash}`
     });
+
   } catch (error: any) {
-    console.error('Error uploading to Lighthouse:', error);
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+    console.error('Error uploading to Filecoin via Lighthouse:', error);
+    return NextResponse.json(
+      { error: 'Internal server error', message: error.message },
+      { status: 500 }
+    );
   }
 }
