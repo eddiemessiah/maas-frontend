@@ -1,62 +1,30 @@
 import { NextResponse } from 'next/server';
+import axios from 'axios';
 
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
   try {
-    const payload = await req.json();
-    
-    // Validate payload
-    if (!payload.agentId || !payload.memoryType || !payload.data) {
-      return NextResponse.json(
-        { error: 'Missing required fields: agentId, memoryType, data' },
-        { status: 400 }
-      );
+    const body = await req.json();
+    const { agentId, memoryType, data } = body;
+
+    if (!agentId || !memoryType || !data) {
+      return NextResponse.json({ error: "Missing required fields: agentId, memoryType, data" }, { status: 400 });
     }
 
-    const apiKey = process.env.LIGHTHOUSE_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: 'Server configuration error: Missing Lighthouse API Key' },
-        { status: 500 }
-      );
-    }
-
-    // Convert JSON to string and create a Blob
-    const jsonString = JSON.stringify(payload);
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    
-    // Append to FormData
     const formData = new FormData();
-    formData.append('file', blob, 'memory.json');
+    const blob = new Blob([JSON.stringify(body)], { type: 'application/json' });
+    formData.append('file', blob);
 
-    // Upload directly using native fetch to bypass Vercel SDK conflicts
-    const response = await fetch('https://node.lighthouse.storage/api/v0/add', {
-      method: 'POST',
+    const response = await axios.post('https://node.lighthouse.storage/api/v0/add', formData, {
       headers: {
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: formData,
+        'Authorization': `Bearer ${process.env.LIGHTHOUSE_API_KEY}`
+      }
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Lighthouse API Error: ${response.status} - ${errorText}`);
-    }
-
-    const responseData = await response.json();
-
-    return NextResponse.json({
-      success: true,
-      cid: responseData.Hash,
-      url: `https://gateway.lighthouse.storage/ipfs/${responseData.Hash}`
-    });
-
+    return NextResponse.json({ success: true, cid: response.data.Hash });
   } catch (error: any) {
-    console.error('Error uploading to Filecoin via Lighthouse REST API:', error);
-    return NextResponse.json(
-      { error: 'Internal server error', message: error.message },
-      { status: 500 }
-    );
+    console.error("Axios upload error:", error?.response?.data || error.message);
+    return NextResponse.json({ error: "Internal server error", message: error.message }, { status: 500 });
   }
 }
