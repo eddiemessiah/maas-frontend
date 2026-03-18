@@ -5,19 +5,15 @@ import { useEffect, useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { Activity, Server, Cpu, Network, Zap } from "lucide-react";
 import { useReadContract } from 'wagmi'
+import { DepositCard } from "@/app/components/DepositCard";
 
-const registryAddress = "0x5818d8A494a0aa7C9eB2Fa6aFCBbd28f02e527E6" as const;
+// Base Sepolia AgentRegistry
+const registryAddress = "0x7B1EfF888ab6fA1C7a2ABbB8E61027B4fF332a0b" as const;
 const registryABI = [
   {
     "inputs": [],
     "name": "getAllAgents",
-    "outputs": [
-      {
-        "internalType": "address[]",
-        "name": "",
-        "type": "address[]"
-      }
-    ],
+    "outputs": [{ "internalType": "address[]", "name": "", "type": "address[]" }],
     "stateMutability": "view",
     "type": "function"
   }
@@ -26,7 +22,7 @@ const registryABI = [
 export default function Home() {
   const [data, setData] = useState<any>(null);
 
-  // Read AgentRegistry from Celo Sepolia
+  // Read AgentRegistry from Base Sepolia
   const { data: agentsData } = useReadContract({
     address: registryAddress,
     abi: registryABI,
@@ -36,7 +32,7 @@ export default function Home() {
   const agentCount = agentsData ? (agentsData as any[]).length : 0;
 
   useEffect(() => {
-    const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://maas-api.up.railway.app";
+    const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://100.94.115.39:8900";
     fetch(`${API_URL}/health`)
       .then((res) => res.json())
       .then(setData)
@@ -111,6 +107,11 @@ export default function Home() {
                 </div>
               </motion.div>
             ))}
+          </div>
+
+          {/* Deposit Card Section */}
+          <div className="mb-8">
+            <DepositCard />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
