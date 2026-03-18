@@ -76,12 +76,16 @@ export default function AgentsPage() {
     e.preventDefault();
     if (!depositAmount) return;
     
-    writeContract({
-      address: PAYMASTER_ADDRESS,
-      abi: paymasterABI,
-      functionName: 'deposit',
-      value: parseEther(depositAmount)
-    });
+    try {
+      writeContract({
+        address: PAYMASTER_ADDRESS,
+        abi: paymasterABI,
+        functionName: 'deposit',
+        value: parseEther(depositAmount)
+      });
+    } catch (err) {
+      console.error("Invalid deposit amount", err);
+    }
   };
 
   return (
