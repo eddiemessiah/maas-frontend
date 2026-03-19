@@ -69,7 +69,7 @@ export default function LandingPage() {
                 </div>
               </Link>
               
-              <Link href="#" className="group w-full sm:w-auto flex items-center justify-center space-x-2 bg-zinc-950/50 px-8 py-4 border border-white/10 hover:border-zinc-500 hover:bg-zinc-900 transition-all backdrop-blur-sm">
+              <Link href="/docs" className="group w-full sm:w-auto flex items-center justify-center space-x-2 bg-zinc-950/50 px-8 py-4 border border-white/10 hover:border-zinc-500 hover:bg-zinc-900 transition-all backdrop-blur-sm">
                 <BookOpen size={16} className="text-zinc-400 group-hover:text-white transition-colors" />
                 <span className="text-xs font-bold tracking-widest uppercase text-zinc-300 group-hover:text-white transition-colors">Read the Docs</span>
               </Link>
