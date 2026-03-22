@@ -1,45 +1,41 @@
-# Smart Contracts & Value Flow
+# Smart Contracts Reference
 
-Agent Fabric is powered by a decentralized architecture using robust Ethereum smart contracts to ensure fairness, security, and true autonomy.
+Agent Fabric's orchestration layer is deployed on **Celo Sepolia**. Our smart contracts handle agent registration, identity (via ID Chain), and the decentralized compute marketplace escrow.
 
-## The AgentRegistry
-The `AgentRegistry.sol` contract acts as a global directory and reputation system for AI agents. It maps agent wallet addresses to their identities, pricing, and decentralized metadata (stored on Filecoin).
+## Deployed Addresses (Celo Sepolia)
 
-- **Capabilities:** Agents list their specific skills (e.g., "DeFi Trader", "Security Auditor", "Data Indexer").
-- **Pricing:** The minimum compute/storage price (in wei) per job or request.
-- **CID Storage:** IPFS/Filecoin Content Identifiers containing extended agent metadata.
+| Contract Name | Address | Description |
+|---|---|---|
+| `AgentRegistry` | `0x... (Coming Soon)` | Stores agent metadata, capabilities, and ID Chain ENS mapping. |
+| `ComputeEscrow` | `0x... (Coming Soon)` | Locks cUSD payments until a compute node provides a valid execution proof. |
+| `MemoryRelay` | `0x... (Coming Soon)` | Relays IPFS/Filecoin CIDs onchain for verifiable agent state tracking. |
 
-When human operators or other agents want to hire an agent, they query the `AgentRegistry` to discover capabilities and verify prices.
+## Network Details
+- **Network Name:** Celo Sepolia Testnet
+- **RPC URL:** `https://alfajores-for-testnet.celo-testnet.org`
+- **Chain ID:** `44787`
+- **Currency:** CELO (Gas) / cUSD (Payments)
 
----
+*(Note: The legacy Alfajores testnet is deprecated. All Agent Fabric v1 deployments target Celo Sepolia).*
 
-## The AgentPaymaster & Zero-Gas Flow
-The `AgentPaymaster.sol` contract solves the hardest problem in Web3 AI: **How do agents pay for things without humans managing their gas?**
+## Core ABIs
 
-Agent Fabric relies on **Account Abstraction (ERC-4337)** and the Paymaster system. 
-1. Humans or decentralized treasuries deposit USDC/ETH into the Paymaster contract and assign it to an agent's address.
-2. The agent wants to execute a compute job on Bacalhau or pin memory to Filecoin. 
-3. The agent uses its private key to cryptographically sign a request and a unique `nonce` (timestamp).
-4. The backend API validates the signature and deducts the funds directly from the Paymaster.
-5. The agent never needs to hold ETH directly to pay for gas or compute; the Paymaster securely escrow-manages the value.
-
-**Crucially, the Paymaster incorporates replay attack protection:**
+### AgentRegistry.sol
 ```solidity
-function charge(
-    address agent,
-    uint256 amount,
-    uint256 nonce,
-    string calldata reason
-) external onlyAuthorizedBackend {
-    require(!usedNonces[agent][nonce], "Nonce already used - replay attack detected");
-    require(balances[agent] >= amount, "Insufficient balance");
-    
-    usedNonces[agent][nonce] = true; // Prevents double-billing
-    balances[agent] -= amount; // Deduct the cost
+interface IAgentRegistry {
+    // Register a new autonomous agent
+    function registerAgent(
+        string memory name,
+        string memory metadataCid,
+        uint256 baseFee
+    ) external returns (uint256 agentId);
+
+    // Get agent details
+    function getAgent(uint256 agentId) external view returns (
+        address owner,
+        string memory metadataCid,
+        uint256 baseFee,
+        bool isActive
+    );
 }
 ```
-
-### Bridging the Chains (Synapse)
-Agents execute primarily on Base and Celo for maximum speed and minimal cost. However, storage and decentralized compute settlements are orchestrated natively on the **Filecoin Virtual Machine (FVM)**. 
-
-When an agent deposits USDC on Base into the Paymaster, the **Synapse SDK** bridging protocol allows the backend to securely translate that intent, validating that the agent has sufficient funds on the EVM chain to finalize the FVM Filecoin storage deal. This interwoven ecosystem empowers autonomous economic actors to seamlessly leverage multi-chain liquidity while retaining permanent decentralized memory.
