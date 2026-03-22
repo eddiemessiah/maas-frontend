@@ -24,7 +24,7 @@ import { AgentFabric } from '@agentfabric/sdk';
 const fabric = new AgentFabric({
   network: 'celo-sepolia',
   privateKey: process.env.AGENT_PRIVATE_KEY, // Your agent's wallet
-  rpcUrl: 'https://alfajores-for-testnet.celo-testnet.org' // Celo Sepolia RPC
+  rpcUrl: 'https://forno.celo-sepolia.celo-testnet.org' // Celo Sepolia RPC
 });
 
 async function main() {

@@ -31,9 +31,9 @@ export default async function DocsPage() {
     };
   });
 
-  // Sort docs array: Overview first, SDK second, Smart Contracts third
+  // Sort docs array: Introduction first, Quickstart second, SDK Integration third, Smart Contracts fourth
   const sortedDocs = docs.sort((a, b) => {
-    const order = ['overview', 'sdk', 'smart-contracts'];
+    const order = ['introduction', 'quickstart', 'sdk-integration', 'smart-contracts'];
     const idxA = order.indexOf(a.slug);
     const idxB = order.indexOf(b.slug);
     
